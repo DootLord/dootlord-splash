@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DOOTLORD</title>
+  <meta name="description" content="dootlord.meme — doot doot.">
+  <meta name="theme-color" content="#84e3b6">
+  <meta property="og:title" content="DOOTLORD">
+  <meta property="og:description" content="doot doot.">
+  <meta property="og:image" content="https://dootlord.meme/assets/img/dootlord.png">
+  <link rel="icon" type="image/png" href="assets/img/dootlord.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <button class="sfx" id="sfx" type="button" aria-pressed="true">SFX ON</button>
+
+  <main class="stage" id="stage">
+    <div class="float" id="float">
+      <div class="tilt" id="tilt">
+        <button class="card" id="skull" type="button" aria-label="Doot">
+          <span class="layer" style="--k:5; --c:#b061ff"></span>
+          <span class="layer" style="--k:4; --c:#3fe0ff"></span>
+          <span class="layer" style="--k:3; --c:#ffe95c"></span>
+          <span class="layer" style="--k:2; --c:#ff9f43"></span>
+          <span class="layer" style="--k:1; --c:#ff4f79"></span>
+          <span class="frame">
+            <span class="art">
+              <img id="portrait" src="assets/img/dootlord.png" width="460" height="460" alt="A glossy black pixel-art skeleton with glowing green eyes" draggable="false">
+              <span class="sheen" id="sheen"><i></i></span>
+              <span class="eye"></span>
+              <span class="beam"></span>
+              <span class="glint"></span>
+              <span class="drip"></span>
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <h1 class="title" id="title">DOOTLORD</h1>
+
+    <p class="tag"><span id="tag">doot doot</span></p>
+
+    <nav class="links" id="links" aria-label="Links"></nav>
+
+    <p class="hint" id="hint">click the skull</p>
+  </main>
+
+  <div class="fx" id="fx" aria-hidden="true"></div>
+
+  <script src="assets/vendor/gsap.min.js" defer></script>
+  <script src="assets/vendor/ScrambleTextPlugin.min.js" defer></script>
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
