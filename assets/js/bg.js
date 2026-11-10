@@ -1,42 +1,113 @@
-// Low-resolution pixel-art background.
+// Low-resolution pixel-art background: dark glow, bone rings,
+// corner rainbows, sparkles and drifting skeleton bits.
 //
 // The canvas is rendered at roughly 1/5th of the viewport and scaled up with
 // nearest-neighbour filtering, so the whole scene is ~80k pixels regardless of
-// screen size. Each frame is one typed-array copy of a pre-dithered base plus
-// a few thousand sparse pixel writes (rings + rainbows) and ~100 fillRects
-// (sparkles). It runs at 30fps on purpose: cheaper, and it reads as pixel art.
+// screen size. Each frame is one typed-array copy of a pre-built base plus a
+// few thousand sparse pixel writes (rings, rainbows) and ~100 tiny
+// draws (sparkles, sprites). It runs at 30fps on purpose: cheaper, and it
+// reads as pixel art.
 
 const TAU = Math.PI * 2;
 const FRAME_MS = 1000 / 30;
 
+const toRgb = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
 // 0xAABBGGRR (little-endian ImageData)
-const rgba = (hex) => {
-  const n = parseInt(hex.slice(1), 16);
-  return (0xff000000 | ((n & 255) << 16) | (((n >> 8) & 255) << 8) | ((n >> 16) & 255)) >>> 0;
-};
-const lighten = (hex, k = 0.55) => {
-  const n = parseInt(hex.slice(1), 16);
-  const f = (c) => Math.round(c + (255 - c) * k);
-  const r = f((n >> 16) & 255), g = f((n >> 8) & 255), b = f(n & 255);
-  return (0xff000000 | (b << 16) | (g << 8) | r) >>> 0;
-};
+const pack = ([r, g, b]) => (0xff000000 | (b << 16) | (g << 8) | r) >>> 0;
+const rgba = (hex) => pack(toRgb(hex));
+const mix = (a, b, k) => a.map((c, i) => Math.round(c + (b[i] - c) * k));
+const lighten = (hex, k = 0.55) => pack(mix(toRgb(hex), [255, 255, 255], k));
 
-const BASE_SHADES = ['#93edc4', '#88e6ba', '#7cdeb0', '#70d5a5', '#66cc9c'].map(rgba);
+/* ---------- backdrop palette ----------
+ * A plain dark field: a soft green glow behind the skull, dithered down in
+ * LEVELS steps to near-black at the edges. */
+const LEVELS = 7;
+const GLOW = toRgb('#173a30');
+const CARBON = toRgb('#0e1115');
+const EDGE = toRgb('#07080a');
+
+const PAL = new Uint32Array(LEVELS);
+for (let l = 0; l < LEVELS; l++) {
+  const k = l / (LEVELS - 1);
+  PAL[l] = pack(k < 0.5 ? mix(GLOW, CARBON, k * 2) : mix(CARBON, EDGE, (k - 0.5) * 2));
+}
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
 const RAINBOW_HEX = ['#ff4f79', '#ff9f43', '#ffe95c', '#3fe0ff', '#5b7bff', '#b061ff'];
 const RAINBOW = RAINBOW_HEX.map(rgba);
 const RAINBOW_LIGHT = RAINBOW_HEX.map((h) => lighten(h));
 
+// `bone: true` rings are drawn as a chain of little bones (dashes with knobs)
 const RINGS = [
-  { r: 1.32, color: rgba('#fff7d6'), dashes: 3, duty: 0.72, speed: 0.012 },
-  { r: 1.62, color: rgba('#ffc6e4'), dashes: 24, duty: 0.5, speed: -0.02 },
-  { r: 2.0, color: rgba('#d4fbff'), dashes: 5, duty: 0.55, speed: 0.03 },
-  { r: 2.55, color: rgba('#ffffff'), dashes: 48, duty: 0.34, speed: -0.008 },
-  { r: 3.3, color: rgba('#e0c8ff'), dashes: 7, duty: 0.6, speed: 0.016 },
+  { r: 1.32, color: rgba('#2f8f72'), dashes: 3, duty: 0.72, speed: 0.012 },
+  { r: 1.64, color: rgba('#9fe6cd'), bone: true, duty: 0.62, speed: -0.018 },
+  { r: 2.0, color: rgba('#2b8f9a'), dashes: 5, duty: 0.55, speed: 0.03 },
+  { r: 2.55, color: rgba('#7a52b3'), dashes: 48, duty: 0.34, speed: -0.008 },
+  { r: 3.3, color: rgba('#5fa890'), bone: true, duty: 0.6, speed: 0.01 },
 ];
 
-const SPARK_COLORS = ['#ffffff', '#ffe95c', '#b061ff', '#3fe0ff', '#ff4f79', '#fff7d6'];
+const SPARK_COLORS = ['#ffffff', '#ffe95c', '#b061ff', '#3fe0ff', '#ff4f79', '#7dffc8'];
+
+/* ---------- skeleton sprites ---------- */
+
+const SPRITE_COLORS = { X: '#46515c', H: '#b4c0cc', G: '#7dffc8', D: '#161a20' };
+const makeSprite = (rows) => {
+  const c = document.createElement('canvas');
+  c.width = rows[0].length;
+  c.height = rows.length;
+  const x = c.getContext('2d');
+  rows.forEach((row, y) => [...row].forEach((ch, i) => {
+    if (ch === '.') return;
+    x.fillStyle = SPRITE_COLORS[ch];
+    x.fillRect(i, y, 1, 1);
+  }));
+  return c;
+};
+const SKULL = makeSprite([
+  '.XXXXX.',
+  'XHHXXXX',
+  'XHXXXXX',
+  'XGGXGGX',
+  'XGGXGGX',
+  'XXXDXXX',
+  '.XXXXX.',
+  '.XDXDX.',
+]);
+const BONES = [
+  makeSprite([
+    'HX....XX',
+    '.HHXXXX.',
+    'XX....XX',
+  ]),
+  makeSprite([
+    'HX....',
+    'XHX...',
+    '.XHX..',
+    '..XXX.',
+    '...XXX',
+    '....XX',
+  ]),
+  makeSprite([
+    '....HX',
+    '...HXX',
+    '..HXX.',
+    '.XXX..',
+    'XXX...',
+    'XX....',
+  ]),
+  makeSprite([
+    'X.X',
+    'HXX',
+    '.H.',
+    '.X.',
+    '.X.',
+    'XXX',
+    'X.X',
+  ]),
+];
 
 export function createBackground(canvas) {
   const ctx = canvas.getContext('2d', { alpha: false });
@@ -46,13 +117,15 @@ export function createBackground(canvas) {
 
   let px = 5, W = 0, H = 0;
   let image, buf, base;
-  let center = { x: 0.5, y: 0.4, half: 0.1 }; // viewport fractions / css px set via setCenter
+  let center = {};
   let centerCss = null;
 
-  let ringIdx, ringAng, ringK;
+  let ringIdx, ringAng, ringK, ringThick;
+  let ringDashes = [], ringKnob = [];
   let rbIdx, rbD, rbAng, rbWhich, bandW = 3;
 
   const ambient = [];
+  const drifters = [];
   const bursts = [];
   const waves = [];
 
@@ -73,25 +146,29 @@ export function createBackground(canvas) {
     buf = new Uint32Array(image.data.buffer);
     base = new Uint32Array(W * H);
 
-    // dithered vertical gradient
-    const n = BASE_SHADES.length - 1;
+    const cx = centerCss ? centerCss.x / px : W * 0.5;
+    const cy = centerCss ? centerCss.y / px : H * 0.4;
+    const half = centerCss ? centerCss.half / px : Math.min(W, H) * 0.2;
+    center = { lx: cx, ly: cy, lhalf: half };
+
+    // dithered radial falloff from the skull's glow to black at the edges
+    const falloff = Math.max(W, H) * 0.62;
     for (let y = 0; y < H; y++) {
-      const v = (y / H) * n;
       for (let x = 0; x < W; x++) {
+        const dx = x - cx, dy = y - cy;
+        const v = Math.min(1, Math.sqrt(dx * dx + dy * dy) / falloff) * (LEVELS - 1);
         const b = (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
-        base[y * W + x] = BASE_SHADES[Math.min(n, Math.floor(v + b))];
+        base[y * W + x] = PAL[Math.min(LEVELS - 1, Math.floor(v + b))];
       }
     }
 
-    const cx = centerCss ? centerCss.x / px : W * center.x;
-    const cy = centerCss ? centerCss.y / px : H * center.y;
-    const half = centerCss ? centerCss.half / px : Math.min(W, H) * 0.2;
-    center = { ...center, lx: cx, ly: cy, lhalf: half };
-
-    // rings: collect the pixels that sit on each circle
+    // rings: collect the pixels that sit on each circle (bone rings also keep
+    // a one-pixel halo either side, used for the knobs at the bone ends)
     const radii = RINGS.map((r) => r.r * half);
-    const maxR = radii[radii.length - 1] + 1;
-    const ri = [], ra = [], rk = [];
+    ringDashes = RINGS.map((r, k) => (r.bone ? Math.max(6, Math.round((TAU * radii[k]) / 15)) : r.dashes));
+    ringKnob = RINGS.map((r, k) => (r.bone ? (1.7 * ringDashes[k]) / (TAU * radii[k]) : 0));
+    const maxR = radii[radii.length - 1] + 2;
+    const ri = [], ra = [], rk = [], rt = [];
     const y0 = Math.max(0, Math.floor(cy - maxR)), y1 = Math.min(H - 1, Math.ceil(cy + maxR));
     const x0 = Math.max(0, Math.floor(cx - maxR)), x1 = Math.min(W - 1, Math.ceil(cx + maxR));
     for (let y = y0; y <= y1; y++) {
@@ -100,10 +177,12 @@ export function createBackground(canvas) {
         const d = Math.sqrt(dx * dx + dy * dy);
         if (d > maxR) continue;
         for (let k = 0; k < radii.length; k++) {
-          if (Math.abs(d - radii[k]) < 0.5) {
+          const off = Math.abs(d - radii[k]);
+          if (off < (RINGS[k].bone ? 1.5 : 0.5)) {
             ri.push(y * W + x);
             ra.push((Math.atan2(dy, dx) + Math.PI) / TAU);
             rk.push(k);
+            rt.push(off < 0.5 ? 0 : 1);
             break;
           }
         }
@@ -112,6 +191,7 @@ export function createBackground(canvas) {
     ringIdx = Uint32Array.from(ri);
     ringAng = Float32Array.from(ra);
     ringK = Uint8Array.from(rk);
+    ringThick = Uint8Array.from(rt);
 
     // rainbows: quarter arcs hugging the top-left and bottom-right corners
     const m = Math.min(W, H);
@@ -161,6 +241,21 @@ export function createBackground(canvas) {
         gate: Math.random(),
       });
     }
+
+    // drifting skulls and bones
+    drifters.length = 0;
+    const dn = Math.max(4, Math.round((W * H) / 7000));
+    for (let i = 0; i < dn; i++) {
+      drifters.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vy: -(0.8 + Math.random() * 1.6),
+        sway: 2 + Math.random() * 4,
+        ph: Math.random() * TAU,
+        img: i % 3 === 0 ? SKULL : BONES[(Math.random() * BONES.length) | 0],
+        gate: Math.random(),
+      });
+    }
   }
 
   function draw(dt) {
@@ -175,9 +270,11 @@ export function createBackground(canvas) {
         const a = ringAng[i];
         if (a > rev[k]) continue;
         const ring = RINGS[k];
-        let p = (a + rot[k]) * ring.dashes;
+        let p = (a + rot[k]) * ringDashes[k];
         p -= Math.floor(p);
-        if (p < ring.duty) buf[ringIdx[i]] = ring.color;
+        if (p >= ring.duty) continue;
+        if (ringThick[i] && p > ringKnob[k] && p < ring.duty - ringKnob[k]) continue;
+        buf[ringIdx[i]] = ring.color;
       }
     }
 
@@ -199,6 +296,16 @@ export function createBackground(canvas) {
     }
 
     ctx.putImageData(image, 0, 0);
+
+    // drifting skulls and bones
+    if (state.sparks > 0) {
+      for (const p of drifters) {
+        if (p.gate > state.sparks) continue;
+        p.y += p.vy * dt;
+        if (p.y < -10) { p.y = H + 4; p.x = Math.random() * W; }
+        ctx.drawImage(p.img, Math.round(p.x + Math.sin(t * 0.3 + p.ph) * p.sway), Math.round(p.y));
+      }
+    }
 
     // shockwaves
     for (let i = waves.length - 1; i >= 0; i--) {
@@ -246,6 +353,10 @@ export function createBackground(canvas) {
       p.y += p.vy * dt;
       const k = p.life / p.max;
       if (k < 0.3 && ((t * 20) | 0) & 1) continue; // flicker out
+      if (p.img) {
+        ctx.drawImage(p.img, Math.round(p.x - p.img.width / 2), Math.round(p.y - p.img.height / 2));
+        continue;
+      }
       const s = k > 0.6 ? p.size : 1;
       ctx.fillStyle = p.c;
       ctx.fillRect(Math.round(p.x), Math.round(p.y), s, s);
@@ -288,7 +399,7 @@ export function createBackground(canvas) {
     stop,
     renderStatic() { draw(0); },
 
-    // centre the rings on an element (css px)
+    // centre the rings and glow on an element (css px)
     setCenter(x, y, half) {
       centerCss = { x, y, half };
       build();
@@ -301,14 +412,17 @@ export function createBackground(canvas) {
         const a = Math.random() * TAU;
         const v = (20 + Math.random() * 70) * power;
         const life = 0.5 + Math.random() * 0.8;
+        const bone = i % 7 === 0;
         bursts.push({
           x, y,
           vx: Math.cos(a) * v,
           vy: Math.sin(a) * v - 20,
           g: 70,
-          life, max: life,
+          life: bone ? life + 0.4 : life,
+          max: bone ? life + 0.4 : life,
           size: Math.random() < 0.35 ? 2 : 1,
           c: RAINBOW_HEX[(Math.random() * RAINBOW_HEX.length) | 0],
+          img: bone ? BONES[(Math.random() * BONES.length) | 0] : null,
         });
       }
       if (bursts.length > 600) bursts.splice(0, bursts.length - 600);
