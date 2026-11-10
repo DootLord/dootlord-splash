@@ -550,6 +550,9 @@ button { font: inherit; color: inherit; }
   gap: clamp(16px, 2.5vw, 24px);
 }
 
+/* fewer, wider cards (projects) */
+.grid-wide { grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
+
 /* about */
 
 .about-grid {

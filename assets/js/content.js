@@ -1,9 +1,8 @@
 // Everything the site says lives in this file. Edit the text here; the layout
 // and animation pick it up automatically.
 //
-// Anything in [square brackets] is a placeholder to replace. Any list can be
-// longer or shorter, and a section whose list is empty is left off the page
-// (and out of the nav).
+// Any list can be longer or shorter, and a section whose list is empty is left
+// off the page (and out of the nav). Fields left as '' are simply not shown.
 
 export const CONTENT = {
   /* ---------- splash screen ---------- */
@@ -21,93 +20,120 @@ export const CONTENT = {
 
   /* ---------- about / background ---------- */
   about: {
-    name: '[Your Name]',
-    role: '[Your job title]',
+    name: 'Shaun Porter',
+    role: 'Software Engineer',
     bio: [
-      '[A short paragraph about who you are and what you do. Two or three sentences is plenty: what you work on, what you care about, what you are known for.]',
-      '[A second paragraph on your background: how you got here, the kind of teams or problems you like, what you are looking for next.]',
+      'Software engineer with 8+ years of professional experience delivering and operating production software, mostly in TypeScript, Node.js, React, Angular, PHP and SQL on cloud-hosted infrastructure.',
+      'Broad full-stack background, from frontend and APIs to real-time systems, CI/CD and production support. Comfortable taking an unfamiliar problem from first requirement through to production, working directly with stakeholders and supporting other engineers.',
     ],
     // The quick-facts box. Any label / value pairs you like.
     stats: [
-      { label: 'Class', value: '[Job title]' },
-      { label: 'Based in', value: '[City, Country]' },
-      { label: 'Experience', value: '[N] years' },
-      { label: 'Focus', value: '[What you do best]' },
-      { label: 'Status', value: '[Open to offers / Happily employed]' },
+      { label: 'Class', value: 'Full-stack engineer' },
+      { label: 'Experience', value: '8+ years' },
+      { label: 'Main stack', value: 'TypeScript / Node.js' },
+      { label: 'Also', value: 'Technical leadership' },
+      { label: 'Status', value: 'Currently employed' },
     ],
     education: [
-      { title: '[Qualification or degree]', place: '[School / University]', period: '[Year] — [Year]' },
-      { title: '[Certification or course]', place: '[Issuer]', period: '[Year]' },
+      { title: 'BSc Computer Science', place: 'University of Portsmouth', period: '' },
     ],
   },
 
   /* ---------- abilities ---------- */
   skills: [
-    { group: '[Languages]', items: ['[Skill]', '[Skill]', '[Skill]', '[Skill]'] },
-    { group: '[Frameworks]', items: ['[Skill]', '[Skill]', '[Skill]'] },
-    { group: '[Tools & platforms]', items: ['[Skill]', '[Skill]', '[Skill]', '[Skill]', '[Skill]'] },
-    { group: '[Ways of working]', items: ['[Skill]', '[Skill]', '[Skill]'] },
+    { group: 'Software engineering', items: ['TypeScript', 'JavaScript', 'Node.js', 'React', 'Angular', 'PHP', 'REST APIs'] },
+    { group: 'Data & integrations', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'WebSockets', 'SSO / JWT'] },
+    { group: 'Cloud & delivery', items: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Linux', 'Grafana'] },
+    { group: 'Engineering practice', items: ['Code review', 'Mentoring', 'Unit testing', 'Performance debugging', 'Production support'] },
   ],
 
   /* ---------- career, newest first ---------- */
   experience: [
     {
-      role: '[Current job title]',
-      company: '[Company]',
-      period: '[Year] — Present',
-      location: '[City / Remote]',
-      summary: '[One or two sentences on what the role is and what you are responsible for.]',
+      role: 'Full Stack Developer',
+      company: 'My Learning Cloud',
+      period: 'Mar 2020 — Sep 2026',
+      location: '',
+      summary: 'Built and ran production software end to end across a modern TypeScript/Node.js platform and a legacy PHP estate, growing into technical leadership along the way.',
       points: [
-        '[Something you built, shipped or improved, ideally with a result.]',
-        '[Another concrete thing you did.]',
-        '[A third, if it earns its place.]',
+        'Helped rewrite a fragile legacy JavaScript courseware application into a maintainable React system built from reusable components.',
+        'Built REST APIs and customer integrations with Node.js/Express, including SSO, JWT authentication, access controls and audit logging.',
+        'Designed real-time workflows with WebSockets and background workers, such as notifying users in-browser when queued reports finished.',
+        'Built an internal AI-assisted translation tool that converts large eLearning courses into 100+ languages in minutes.',
+        'Picked up Cordova from scratch to ship a production mobile app in under a month; it is still used by 1,000+ Android users.',
+        'Took on technical leadership: prioritising work with stakeholders, making release decisions, leading code reviews, interviewing and mentoring.',
       ],
-      tags: ['[Tech]', '[Tech]', '[Tech]'],
+      tags: ['TypeScript', 'Node.js', 'React', 'Angular', 'PHP', 'AWS', 'Docker'],
     },
     {
-      role: '[Previous job title]',
-      company: '[Company]',
-      period: '[Year] — [Year]',
-      location: '[City / Remote]',
-      summary: '[One or two sentences on the role.]',
-      points: [
-        '[Something you built, shipped or improved.]',
-        '[Another concrete thing you did.]',
-      ],
-      tags: ['[Tech]', '[Tech]'],
-    },
-    {
-      role: '[Earlier job title]',
-      company: '[Company]',
-      period: '[Year] — [Year]',
-      location: '[City / Remote]',
-      summary: '[One or two sentences on the role.]',
+      role: 'Full Stack Developer',
+      company: 'You Digital',
+      period: 'Jan 2020 — Feb 2020',
+      location: '',
+      summary: 'Two-person team delivering configurable WordPress sites for multiple clients, turning supplied designs into working production sites.',
       points: [],
-      tags: ['[Tech]'],
+      tags: ['WordPress', 'Gutenberg'],
+    },
+    {
+      role: 'Junior Developer',
+      company: 'Maru/',
+      period: 'Jun 2019 — Dec 2019',
+      location: '',
+      summary: 'Six-person agile team maintaining internal authentication and survey-management services, contributing security improvements, UI components and application changes.',
+      points: [],
+      tags: ['PHP', 'Node.js', 'MySQL'],
+    },
+    {
+      role: 'Web Developer',
+      company: 'University of Portsmouth',
+      period: 'Aug 2017 — Aug 2018',
+      location: '',
+      summary: 'Co-created and maintained operational tools for IT staff, including query logging, check-in, stock and inventory systems.',
+      points: [],
+      tags: ['PHP', 'MySQL', 'Node.js', 'Electron'],
     },
   ],
 
   /* ---------- projects ---------- */
   projects: [
-    { name: '[Project name]', blurb: '[What it is and why it is interesting.]', tags: ['[Tech]', '[Tech]'], href: '' },
-    { name: '[Project name]', blurb: '[What it is and why it is interesting.]', tags: ['[Tech]'], href: '' },
-    { name: '[Project name]', blurb: '[What it is and why it is interesting.]', tags: ['[Tech]', '[Tech]'], href: '' },
+    {
+      name: 'Eden',
+      blurb: 'An EVE Online-inspired game that runs in the browser, with large real-time persistent battles, buildings, an economy and more.',
+      tags: ['Browser game', 'Real-time', 'Persistent world'],
+      href: '',
+    },
+    {
+      name: 'Catalyst',
+      blurb: 'A FiveM (GTA V multiplayer) server that I host myself and build the content for from scratch.',
+      tags: ['FiveM', 'Self-hosted'],
+      href: '',
+    },
+    {
+      name: 'Florbs',
+      blurb: 'A loot-box opening game, built full stack.',
+      tags: ['Game', 'Full stack'],
+      href: '',
+    },
+    {
+      name: 'Mobile AI assistant',
+      blurb: 'An AI assistant for my phone that integrates with tools and talks to my own API directly.',
+      tags: ['AI', 'Mobile'],
+      href: '',
+    },
   ],
 
   /* ---------- personal ---------- */
   personal: [
-    { title: '[Hobby or interest]', text: '[A sentence or two. What you get up to away from the keyboard.]' },
-    { title: '[Hobby or interest]', text: '[A sentence or two.]' },
-    { title: '[Hobby or interest]', text: '[A sentence or two.]' },
+    { title: 'Modding', text: 'Contributed bug fixes to the Ultimate Apocalypse mod for Dawn of War – Soulstorm, merged and shipped in releases.' },
+    { title: 'Self-hosting', text: 'Running my own containerised services, with Cloudflare out front.' },
+    { title: 'Currently learning', text: 'Go, and going deeper on cloud and container topics.' },
   ],
 
   /* ---------- contact ---------- */
   contact: {
-    blurb: '[How you would like people to get in touch, and what about.]',
+    blurb: 'Not looking for new career opportunities, but always up for collaborating. If you have an idea or want to build something together, reach out on GitHub.',
     links: [
-      { label: 'Email', href: 'mailto:you@example.com' },
       { label: 'GitHub', href: 'https://github.com/DootLord' },
-      { label: 'LinkedIn', href: '' },
     ],
   },
 };

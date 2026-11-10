@@ -109,7 +109,7 @@ const SECTIONS = [
     id: 'projects', nav: 'Projects', kicker: 'loot',
     show: (c) => has(c.projects),
     body: ({ projects }) => `
-      <div class="grid">
+      <div class="grid grid-wide">
         ${projects.map((p) => {
           const tag = p.href ? 'a' : 'div';
           const attrs = p.href ? ` href="${esc(p.href)}" rel="noopener"` : '';
