@@ -113,7 +113,16 @@ export function createBackground(canvas) {
   const ctx = canvas.getContext('2d', { alpha: false });
 
   // animatable by the intro timeline
-  const state = { rings: 0, rainbow: 0, sparks: 0 };
+  // `dim` (0..1) unwinds the rings again as the page scrolls past the splash
+  const state = { rings: 0, rainbow: 0, sparks: 0, dim: 0 };
+
+  // Size to the *largest* viewport so mobile URL-bar show/hide while scrolling
+  // neither uncovers an edge nor forces a rebuild.
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none';
+  document.body.append(probe);
+  const viewport = () => ({ vw: window.innerWidth, vh: Math.max(window.innerHeight, probe.offsetHeight) });
+  let lastVw = 0, lastVh = 0;
 
   let px = 5, W = 0, H = 0;
   let image, buf, base;
@@ -132,7 +141,8 @@ export function createBackground(canvas) {
   let running = false, raf = 0, last = 0, t = 0;
 
   function build() {
-    const vw = window.innerWidth, vh = window.innerHeight;
+    const { vw, vh } = viewport();
+    lastVw = vw; lastVh = vh;
     px = Math.max(3, Math.round(Math.max(vw, vh) / 400));
     W = Math.ceil(vw / px);
     H = Math.ceil(vh / px);
@@ -262,9 +272,10 @@ export function createBackground(canvas) {
     buf.set(base);
 
     // rings
-    if (state.rings > 0) {
+    const ringsShown = state.rings * (1 - state.dim);
+    if (ringsShown > 0) {
       const rot = RINGS.map((r) => t * r.speed);
-      const rev = RINGS.map((_, k) => Math.max(0, Math.min(1, state.rings * 1.8 - k * 0.2)));
+      const rev = RINGS.map((_, k) => Math.max(0, Math.min(1, ringsShown * 1.8 - k * 0.2)));
       for (let i = 0, n = ringIdx.length; i < n; i++) {
         const k = ringK[i];
         const a = ringAng[i];
@@ -388,7 +399,12 @@ export function createBackground(canvas) {
   let resizeTimer = 0;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { build(); if (!running) draw(0); }, 120);
+    resizeTimer = setTimeout(() => {
+      const v = viewport();
+      if (v.vw === lastVw && v.vh === lastVh) return;
+      build();
+      if (!running) draw(0);
+    }, 120);
   });
 
   build();
@@ -401,6 +417,7 @@ export function createBackground(canvas) {
 
     // centre the rings and glow on an element (css px)
     setCenter(x, y, half) {
+      if (centerCss && centerCss.x === x && centerCss.y === y && centerCss.half === half) return;
       centerCss = { x, y, half };
       build();
       if (!running) draw(0);

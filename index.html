@@ -13,7 +13,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Pixelify+Sans:wght@700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="assets/css/style.css">
   <script>document.documentElement.classList.add('js')</script>
@@ -23,7 +23,8 @@
 
   <button class="sfx" id="sfx" type="button" aria-pressed="true">SFX ON</button>
 
-  <main class="stage" id="stage">
+  <section class="splash" id="top" aria-label="Intro">
+  <div class="stage" id="stage">
     <div class="float" id="float">
       <div class="tilt" id="tilt">
         <button class="card" id="skull" type="button" aria-label="Doot">
@@ -53,12 +54,34 @@
     <nav class="links" id="links" aria-label="Links"></nav>
 
     <p class="hint" id="hint">click the skull</p>
-  </main>
+  </div>
+
+  <a class="more" href="#about">
+    <span class="more-in">see more<span class="more-arrow" aria-hidden="true"></span></span>
+  </a>
+  </section>
+
+  <header class="bar" id="bar">
+    <a class="bar-home" href="#top" aria-label="Back to the top">
+      <span class="bar-skull" aria-hidden="true"></span>
+      <span class="bar-name">DOOTLORD</span>
+    </a>
+    <nav id="nav" aria-label="Sections"></nav>
+  </header>
+
+  <main class="cv" id="cv"></main>
+
+  <footer class="foot">
+    <span>dootlord.meme</span>
+    <a href="#top">back to top</a>
+  </footer>
 
   <div class="fx" id="fx" aria-hidden="true"></div>
 
   <script src="assets/vendor/gsap.min.js" defer></script>
   <script src="assets/vendor/ScrambleTextPlugin.min.js" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/vendor/ScrollToPlugin.min.js" defer></script>
   <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

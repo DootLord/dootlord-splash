@@ -1,28 +1,12 @@
 import { createBackground } from './bg.js';
+import { CONTENT } from './content.js';
+import { renderCV, initCVMotion } from './cv.js';
 
-/* ------------------------------------------------------------------ *
- * Config — edit these.
- * ------------------------------------------------------------------ */
+// All editable text, links and sounds live in content.js.
+const { links: LINKS, sounds: SOUNDS, soundVolume: SOUND_VOLUME, taglines: TAGLINES } = CONTENT.splash;
 
-// Buttons under the title. Leave empty to hide the row.
-const LINKS = [
-  { label: 'GitHub', href: 'https://github.com/DootLord' },
-];
-
-// Doot sounds: one is picked at random per click. A static page can't list a
-// folder, so add new files from audio/ here.
-const SOUNDS = [
-  'audio/doot-dan.mp3',
-  'audio/doot-becca.mp3',
-];
-const SOUND_VOLUME = 0.7;
-
-const TAGLINES = ['doot doot', 'bones, but shiny', 'powered by calcium', 'certified spooky', 'dootlord.meme'];
-
-/* ------------------------------------------------------------------ */
-
-const { gsap, ScrambleTextPlugin } = window;
-gsap.registerPlugin(ScrambleTextPlugin);
+const { gsap, ScrambleTextPlugin, ScrollTrigger, ScrollToPlugin } = window;
+gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger, ScrollToPlugin);
 
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FINE = matchMedia('(pointer: fine)').matches;
@@ -57,8 +41,12 @@ for (const l of LINKS) {
   a.href = l.href;
   a.textContent = l.label;
   a.rel = 'noopener';
+  a.className = 'btn';
   linksEl.append(a);
 }
+
+const sectionIds = renderCV($('#cv'), $('#nav'), CONTENT);
+const cvMotion = () => initCVMotion({ gsap, ScrollTrigger, bg, reduced: RM, ids: sectionIds });
 
 if (!FINE) hint.textContent = 'tap the skull';
 
@@ -331,18 +319,21 @@ function startIdle() {
 function intro() {
   // (the link buttons have their own CSS transform transitions, so move the row, not the buttons)
   const others = [tag.parentElement, linksEl, hint];
+  const more = $('.more');
 
   if (RM) {
     Object.assign(bg.state, { rings: 1, rainbow: 1, sparks: 1 });
     bg.renderStatic();
     fan.v = 1; applyFan();
-    gsap.set([stage, sfxBtn], { autoAlpha: 1 });
-    gsap.from([stage, sfxBtn], { opacity: 0, duration: 0.6 });
+    gsap.set([stage, sfxBtn, more], { autoAlpha: 1 });
+    gsap.from([stage, sfxBtn, more], { opacity: 0, duration: 0.6 });
+    cvMotion();
     return;
   }
 
   bg.start();
-  gsap.set([stage, sfxBtn], { autoAlpha: 1 });
+  gsap.set([stage, sfxBtn, more], { autoAlpha: 1 });
+  cvMotion();
 
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: startIdle });
 
@@ -370,6 +361,7 @@ function intro() {
     // the rest
     .from(others, { y: 18, opacity: 0, duration: 0.4, ease: 'steps(5)', stagger: 0.09 }, 1.25)
     .from(sfxBtn, { opacity: 0, duration: 0.4 }, 1.6)
+    .from(more, { y: -14, opacity: 0, duration: 0.5, ease: 'steps(5)' }, 1.9)
     .to(tag, { duration: 0.8, scrambleText: { text: TAGLINES[0], chars: 'DOT01+*', speed: 0.5 }, ease: 'none' }, 1.3);
 }
 
