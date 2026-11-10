@@ -9,6 +9,14 @@ const LINKS = [
   { label: 'GitHub', href: 'https://github.com/DootLord' },
 ];
 
+// Doot sounds: one is picked at random per click. A static page can't list a
+// folder, so add new files from audio/ here.
+const SOUNDS = [
+  'audio/doot-dan.mp3',
+  'audio/doot-becca.mp3',
+];
+const SOUND_VOLUME = 0.7;
+
 const TAGLINES = ['doot doot', 'bones, but shiny', 'powered by calcium', 'certified spooky', 'dootlord.meme'];
 
 /* ------------------------------------------------------------------ */
@@ -65,12 +73,14 @@ let doots = parseInt(store.get('doots', '0'), 10) || 0;
 const showCount = () => { hint.textContent = `doots: ${doots}`; };
 if (doots > 0) showCount();
 
-/* ---------- sound: a tiny synthesised doot ---------- */
+/* ---------- sound: a random clip from /audio ---------- */
 
 let soundOn = store.get('sfx', 'on') !== 'off';
-let ac = null;
-const NOTES = [233.08, 277.18, 311.13, 349.23, 415.3, 466.16, 349.23, 311.13];
-let noteI = 0;
+const clips = SOUNDS.map((src) => {
+  const a = new Audio(src);
+  a.preload = 'auto';
+  return a;
+});
 
 function syncSfx() {
   sfxBtn.textContent = soundOn ? 'SFX ON' : 'SFX OFF';
@@ -84,44 +94,11 @@ sfxBtn.addEventListener('click', () => {
 });
 
 function playDoot() {
-  if (!soundOn) return;
-  try {
-    ac ??= new (window.AudioContext || window.webkitAudioContext)();
-    if (ac.state === 'suspended') ac.resume();
-    const t = ac.currentTime;
-    const f = NOTES[noteI++ % NOTES.length];
-
-    const osc = ac.createOscillator();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(f * 0.92, t);
-    osc.frequency.exponentialRampToValueAtTime(f, t + 0.035);
-
-    const sub = ac.createOscillator();
-    sub.type = 'square';
-    sub.frequency.setValueAtTime(f / 2, t);
-
-    const lp = ac.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.Q.value = 4;
-    lp.frequency.setValueAtTime(500, t);
-    lp.frequency.exponentialRampToValueAtTime(2600, t + 0.04);
-    lp.frequency.exponentialRampToValueAtTime(900, t + 0.22);
-
-    const amp = ac.createGain();
-    amp.gain.setValueAtTime(0.0001, t);
-    amp.gain.exponentialRampToValueAtTime(0.16, t + 0.015);
-    amp.gain.setValueAtTime(0.14, t + 0.13);
-    amp.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
-
-    const subGain = ac.createGain();
-    subGain.gain.value = 0.35;
-
-    osc.connect(lp);
-    sub.connect(subGain).connect(lp);
-    lp.connect(amp).connect(ac.destination);
-    osc.start(t); sub.start(t);
-    osc.stop(t + 0.3); sub.stop(t + 0.3);
-  } catch { /* no audio, no problem */ }
+  if (!soundOn || !clips.length) return;
+  // clone so rapid clicks overlap instead of cutting each other off
+  const clip = clips[(Math.random() * clips.length) | 0].cloneNode();
+  clip.volume = SOUND_VOLUME;
+  clip.play().catch(() => { /* blocked or missing file — stay silent */ });
 }
 
 /* ---------- gloss mask: only the dark (skull) pixels catch the sheen ---------- */
