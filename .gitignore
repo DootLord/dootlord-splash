@@ -1,0 +1,3 @@
+# Blog posts live on the server, not in git. Only the formatting demo is tracked.
+posts/*
+!posts/_demo.md

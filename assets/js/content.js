@@ -10,11 +10,12 @@ export const CONTENT = {
     taglines: ['doot doot', 'bones, but shiny', 'powered by calcium', 'certified spooky', 'dootlord.meme'],
     // Buttons under the title. Leave empty to hide the row.
     links: [
+      { label: 'Blog', href: 'blog/' },
       { label: 'GitHub', href: 'https://github.com/DootLord' },
     ],
     // One is picked at random per skull click. A static page can't list a
     // folder, so add new files from audio/ here.
-    sounds: ['audio/doot-dan.mp3', 'audio/doot-becca.mp3'],
+    sounds: ['audio/doot-dan.mp3', 'audio/doot-becca.mp3', 'audio/doot-jack.mp3'],
     soundVolume: 0.7,
   },
 

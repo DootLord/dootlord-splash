@@ -148,17 +148,22 @@ const SECTIONS = [
   },
 ];
 
-export function renderCV(root, nav, content) {
+// exposes the sprites to CSS as --img-skull, --img-spine, --img-chevron
+export function installSprites() {
   for (const [name, rows] of Object.entries(SPRITES)) {
     document.documentElement.style.setProperty(name, spriteUrl(rows));
   }
+}
+
+export function renderCV(root, nav, content) {
+  installSprites();
   const shown = SECTIONS.filter((s) => s.show(content));
   root.innerHTML = shown.map((s, i) => `
     <section class="sec" id="${s.id}" aria-label="${s.nav}">
       ${head(i + 1, s.kicker, s.nav)}
       ${s.body(content)}
     </section>`).join('');
-  nav.innerHTML = shown.map((s) => `<a href="#${s.id}">${s.nav}</a>`).join('');
+  nav.innerHTML = shown.map((s) => `<a href="#${s.id}">${s.nav}</a>`).join('') + '<a href="blog/">Blog</a>';
   return shown.map((s) => s.id);
 }
 

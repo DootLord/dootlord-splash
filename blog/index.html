@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Blog — DOOTLORD</title>
+  <meta name="description" content="Posts from dootlord.meme.">
+  <meta name="theme-color" content="#0b0d10">
+  <link rel="icon" type="image/png" href="../assets/img/dootlord.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Pixelify+Sans:wght@700&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/blog.css">
+</head>
+<body class="blog-page">
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <header class="bar" id="bar">
+    <a class="bar-home" href="../" aria-label="Back to the main site">
+      <span class="bar-skull" aria-hidden="true"></span>
+      <span class="bar-name">DOOTLORD</span>
+    </a>
+    <nav aria-label="Site">
+      <a href="./" class="on" data-index>Blog</a>
+      <a href="../#about">About</a>
+      <a href="../#career">Career</a>
+      <a href="../#projects">Projects</a>
+    </nav>
+  </header>
+
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <div class="read-spine" id="read-spine" aria-hidden="true">
+    <span class="spine-skull"></span>
+    <span class="spine"></span>
+  </div>
+
+  <main class="cv blog" id="view" aria-live="polite"></main>
+
+  <footer class="foot">
+    <span>dootlord.meme</span>
+    <a href="../">main site</a>
+  </footer>
+
+  <noscript><p style="padding:80px 20px;text-align:center">The blog needs JavaScript to load its posts.</p></noscript>
+
+  <script src="../assets/vendor/gsap.min.js" defer></script>
+  <script src="../assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="../assets/vendor/marked.min.js" defer></script>
+  <script src="../assets/vendor/highlight.min.js" defer></script>
+  <script type="module" src="../assets/js/blog.js"></script>
+</body>
+</html>

@@ -367,6 +367,15 @@ function intro() {
 
 /* ---------- boot ---------- */
 
+// The sections are rendered by script, so a link like /#career has nothing to
+// land on until now.
+function jumpToHash() {
+  if (location.hash.length < 2) return;
+  let el = null;
+  try { el = document.querySelector(location.hash); } catch { /* not a valid selector */ }
+  if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 64);
+}
+
 const timeout = (ms) => new Promise((r) => setTimeout(r, ms));
 
 applyFan();
@@ -377,4 +386,5 @@ Promise.race([
 ]).then(() => {
   syncCenter();
   intro();
+  jumpToHash();
 });
