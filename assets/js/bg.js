@@ -1,10 +1,10 @@
-// Low-resolution pixel-art background: carbon-fibre weave, bone rings,
+// Low-resolution pixel-art background: dark glow, bone rings,
 // corner rainbows, sparkles and drifting skeleton bits.
 //
 // The canvas is rendered at roughly 1/5th of the viewport and scaled up with
 // nearest-neighbour filtering, so the whole scene is ~80k pixels regardless of
 // screen size. Each frame is one typed-array copy of a pre-built base plus a
-// few thousand sparse pixel writes (gloss band, rings, rainbows) and ~100 tiny
+// few thousand sparse pixel writes (rings, rainbows) and ~100 tiny
 // draws (sparkles, sprites). It runs at 30fps on purpose: cheaper, and it
 // reads as pixel art.
 
@@ -21,34 +21,18 @@ const rgba = (hex) => pack(toRgb(hex));
 const mix = (a, b, k) => a.map((c, i) => Math.round(c + (b[i] - c) * k));
 const lighten = (hex, k = 0.55) => pack(mix(toRgb(hex), [255, 255, 255], k));
 
-/* ---------- carbon palette ----------
- * LEVELS brightness steps (a faint green glow behind the skull falling off to
- * near-black), each with three weave tones (highlight / mid / shadow), plus
- * two brighter copies used by the gloss sweep. */
-const LEVELS = 5;
-const GLOW = toRgb('#16302a');
-const CARBON = toRgb('#0f1216');
-const EDGE = toRgb('#08090c');
-const SHEEN = toRgb('#bfeee0');
+/* ---------- backdrop palette ----------
+ * A plain dark field: a soft green glow behind the skull, dithered down in
+ * LEVELS steps to near-black at the edges. */
+const LEVELS = 7;
+const GLOW = toRgb('#173a30');
+const CARBON = toRgb('#0e1115');
+const EDGE = toRgb('#07080a');
 
-const PAL = new Uint32Array(LEVELS * 3);
-const PAL_G1 = new Uint32Array(LEVELS * 3);
-const PAL_G2 = new Uint32Array(LEVELS * 3);
+const PAL = new Uint32Array(LEVELS);
 for (let l = 0; l < LEVELS; l++) {
   const k = l / (LEVELS - 1);
-  const mid = k < 0.5 ? mix(GLOW, CARBON, k * 2) : mix(CARBON, EDGE, (k - 0.5) * 2);
-  const tones = [
-    mid.map((c) => Math.min(255, Math.round(c * 1.5 + 5))),
-    mid,
-    mid.map((c) => Math.round(c * 0.62)),
-  ];
-  tones.forEach((tone, i) => {
-    PAL[l * 3 + i] = pack(tone);
-    // the weave highlight catches more of the gloss than the shadow does
-    const catchK = [1, 0.6, 0.3][i];
-    PAL_G1[l * 3 + i] = pack(mix(tone, SHEEN, 0.1 * catchK));
-    PAL_G2[l * 3 + i] = pack(mix(tone, SHEEN, 0.26 * catchK));
-  });
+  PAL[l] = pack(k < 0.5 ? mix(GLOW, CARBON, k * 2) : mix(CARBON, EDGE, (k - 0.5) * 2));
 }
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
@@ -132,7 +116,7 @@ export function createBackground(canvas) {
   const state = { rings: 0, rainbow: 0, sparks: 0 };
 
   let px = 5, W = 0, H = 0;
-  let image, buf, base, baseIdx;
+  let image, buf, base;
   let center = {};
   let centerCss = null;
 
@@ -144,7 +128,6 @@ export function createBackground(canvas) {
   const drifters = [];
   const bursts = [];
   const waves = [];
-  let gloss = -1; // 0..1 while a sweep is in flight
 
   let running = false, raf = 0, last = 0, t = 0;
 
@@ -162,27 +145,20 @@ export function createBackground(canvas) {
     image = ctx.createImageData(W, H);
     buf = new Uint32Array(image.data.buffer);
     base = new Uint32Array(W * H);
-    baseIdx = new Uint8Array(W * H);
 
     const cx = centerCss ? centerCss.x / px : W * 0.5;
     const cy = centerCss ? centerCss.y / px : H * 0.4;
     const half = centerCss ? centerCss.half / px : Math.min(W, H) * 0.2;
     center = { lx: cx, ly: cy, lhalf: half };
 
-    // carbon weave: 3px tows alternating horizontal / vertical, with a
     // dithered radial falloff from the skull's glow to black at the edges
-    const falloff = Math.max(W, H) * 0.7;
+    const falloff = Math.max(W, H) * 0.62;
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const dx = x - cx, dy = y - cy;
         const v = Math.min(1, Math.sqrt(dx * dx + dy * dy) / falloff) * (LEVELS - 1);
         const b = (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
-        const level = Math.min(LEVELS - 1, Math.floor(v + b));
-        const horizontal = (((x / 3) | 0) + ((y / 3) | 0)) & 1;
-        const tone = horizontal ? y % 3 : x % 3;
-        const i = y * W + x;
-        baseIdx[i] = level * 3 + tone;
-        base[i] = PAL[baseIdx[i]];
+        base[y * W + x] = PAL[Math.min(LEVELS - 1, Math.floor(v + b))];
       }
     }
 
@@ -282,28 +258,8 @@ export function createBackground(canvas) {
     }
   }
 
-  function drawGloss(dt) {
-    gloss += dt / 1.5;
-    if (gloss >= 1) { gloss = -1; return; }
-    const k = gloss * gloss * (3 - 2 * gloss);
-    const slope = 0.6;
-    const s = -16 + k * (W + H * slope + 32);
-    for (let y = 0; y < H; y++) {
-      const xc = Math.round(s - y * slope);
-      for (let dx = -7; dx <= 12; dx++) {
-        const x = xc + dx;
-        if (x < 0 || x >= W) continue;
-        if (dx > 7 && dx < 10) continue; // gap before the thin trailing line
-        const i = y * W + x;
-        buf[i] = (dx >= -2 && dx <= 2 ? PAL_G2 : PAL_G1)[baseIdx[i]];
-      }
-    }
-  }
-
   function draw(dt) {
     buf.set(base);
-
-    if (gloss >= 0) drawGloss(dt);
 
     // rings
     if (state.rings > 0) {
@@ -449,9 +405,6 @@ export function createBackground(canvas) {
       build();
       if (!running) draw(0);
     },
-
-    // one diagonal highlight across the carbon
-    gloss() { if (running && gloss < 0) gloss = 0; },
 
     burst(xCss, yCss, count = 40, power = 1) {
       const x = xCss / px, y = yCss / px;

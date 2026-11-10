@@ -309,7 +309,6 @@ function startIdle() {
   // gloss sweep + glint, on a slow, slightly irregular clock
   const shine = () => {
     sweepSheen();
-    bg.gloss();
     gsap.delayedCall(0.35, glint);
     gsap.delayedCall(rand(5, 8), shine);
   };
@@ -378,7 +377,7 @@ function intro() {
     .from(card, { scale: 0, rotation: -14, duration: 0.7, ease: 'back.out(1.8)' }, 0.2)
     .to(fan, { v: 1, duration: 0.9, ease: 'elastic.out(1, 0.45)', onUpdate: applyFan }, 0.6)
     .from('.eye', { opacity: 0, scale: 0, duration: 0.5, ease: 'back.out(3)' }, 0.75)
-    .add(() => { sweepSheen(0.8); glint(); bg.gloss(); }, 0.95)
+    .add(() => { sweepSheen(0.8); glint(); }, 0.95)
 
     // title letters drop and bounce
     .from(letters, {
