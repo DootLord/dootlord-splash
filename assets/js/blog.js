@@ -70,7 +70,8 @@ async function listFiles() {
       const text = await r.text();
       let files;
       try {
-        files = JSON.parse(text).map((e) => (typeof e === 'string' ? { name: e } : { name: e.name, mtime: e.mtime }));
+        const listing = JSON.parse(text);
+        files = (Array.isArray(listing) ? listing : listing.entries).map((e) => (typeof e === 'string' ? { name: e } : { name: e.name, mtime: e.mtime }));
       } catch {
         files = [...text.matchAll(/href="([^"?#]+\.md)"/gi)].map((m) => ({ name: decodeURIComponent(m[1].split('/').pop()) }));
       }
