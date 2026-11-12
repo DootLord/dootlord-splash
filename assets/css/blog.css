@@ -153,7 +153,7 @@ a.post-card:hover .post-card-title, a.post-card:focus-visible .post-card-title {
 /* headings */
 .prose h1.gloss, .prose h2.gloss {
   display: table;
-  margin: 1.9em 0 .7em;
+  margin: 1.0em 0 .7em;
   padding-right: .12em;
   font-size: clamp(1.6rem, 5vw, 2.3rem);
   line-height: 1.05;
