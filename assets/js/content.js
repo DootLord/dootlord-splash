@@ -21,7 +21,7 @@ export const CONTENT = {
 
   /* ---------- about / background ---------- */
   about: {
-    name: 'Shaun Porter',
+    name: 'DootLord',
     role: 'Software Engineer',
     bio: [
       'Software engineer with 8+ years of professional experience delivering and operating production software, mostly in TypeScript, Node.js, React, Angular, PHP and SQL on cloud-hosted infrastructure.',
@@ -36,7 +36,7 @@ export const CONTENT = {
       { label: 'Status', value: 'Currently employed' },
     ],
     education: [
-      { title: 'BSc Computer Science', place: 'University of Portsmouth', period: '' },
+      { title: 'BSc Computer Science', place: '', period: '' },
     ],
   },
 
@@ -52,8 +52,8 @@ export const CONTENT = {
   experience: [
     {
       role: 'Full Stack Developer',
-      company: 'My Learning Cloud',
-      period: 'Mar 2020 — Sep 2026',
+      company: 'An eLearning platform company',
+      period: '2020 — 2026',
       location: '',
       summary: 'Built and ran production software end to end across a modern TypeScript/Node.js platform and a legacy PHP estate, growing into technical leadership along the way.',
       points: [
@@ -68,8 +68,8 @@ export const CONTENT = {
     },
     {
       role: 'Full Stack Developer',
-      company: 'You Digital',
-      period: 'Jan 2020 — Feb 2020',
+      company: 'A digital agency',
+      period: '2020',
       location: '',
       summary: 'Two-person team delivering configurable WordPress sites for multiple clients, turning supplied designs into working production sites.',
       points: [],
@@ -77,8 +77,8 @@ export const CONTENT = {
     },
     {
       role: 'Junior Developer',
-      company: 'Maru/',
-      period: 'Jun 2019 — Dec 2019',
+      company: 'A market research company',
+      period: '2019',
       location: '',
       summary: 'Six-person agile team maintaining internal authentication and survey-management services, contributing security improvements, UI components and application changes.',
       points: [],
@@ -86,8 +86,8 @@ export const CONTENT = {
     },
     {
       role: 'Web Developer',
-      company: 'University of Portsmouth',
-      period: 'Aug 2017 — Aug 2018',
+      company: 'A university IT department',
+      period: '2017 — 2018',
       location: '',
       summary: 'Co-created and maintained operational tools for IT staff, including query logging, check-in, stock and inventory systems.',
       points: [],
