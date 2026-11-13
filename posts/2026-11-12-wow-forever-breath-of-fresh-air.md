@@ -11,7 +11,7 @@ I'm a big fan of it. Not just because it brings back that old-school MMO vibe I'
 
 It really pulls on the old heartstrings of what an MMO **should** be, at least in my eyes.
 
-![](img/2026-11-12-wow-forever-breath-of-fresh-air/screenshot.jpg)
+![](img/2026-11-12-wow-forever-breath-of-fresh-air/pasted-image-20261113143432.jpg)
 
 ## An MMO shouldn't just be a gear treadmill
 
@@ -30,6 +30,8 @@ It's about having a role in that world. Learning things, becoming better at what
 ## Actually having a place in the world
 
 One of the things I'm enjoying most about WoW Forever is how much value there is in the smaller stuff.
+
+![](img/2026-11-12-wow-forever-breath-of-fresh-air/pasted-image-20261113144501.jpg)
 
 I can put down a campfire. I can use my professions to interact with people and the world around me. I can go fishing and potentially find something rare that's genuinely useful to someone on the auction house.
 

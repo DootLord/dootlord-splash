@@ -2,10 +2,21 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Blog: convert images to JPG",
+      // starts by itself when the repo is opened (VS Code asks once to allow that)
+      "label": "Blog: sync from Obsidian (watch)",
       "type": "shell",
       "command": "powershell",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/jpg-images.ps1"],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/sync-vault.ps1", "-Watch"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "silent", "panel": "dedicated" }
+    },
+    {
+      "label": "Blog: sync from Obsidian (once)",
+      "type": "shell",
+      "command": "powershell",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/tools/sync-vault.ps1"],
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "shared" }
     },

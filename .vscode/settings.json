@@ -1,9 +1,0 @@
-{
-  // Pasting or dropping an image into a post saves it to posts/img/<post-name>/
-  // and inserts a normal Markdown image link to it.
-  "markdown.copyFiles.destination": {
-    "**/posts/*.md": "img/${documentBaseName}/"
-  },
-  "markdown.editor.filePaste.enabled": "always",
-  "markdown.editor.drop.enabled": "always"
-}
