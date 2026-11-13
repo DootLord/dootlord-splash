@@ -34,8 +34,18 @@ scp my-post.md server:/path/to/site/posts/2026-11-10-my-post.md
   ```
 
 - **Formatting:** `posts/_demo.md` shows every block type (callouts, code, images, tables, dividers). View it at `/blog/?p=_demo`.
-- **Images:** put them in `posts/` (or a subfolder) and reference them relative to the post.
+- **Images:** put them in `posts/` (or a subfolder) and reference them relative to the post. An image on its own line (blank lines around it) gets the framed treatment, and its alt text becomes the caption: `![Caption here](img/my-post/shot.jpg)`.
 - **Obsidian embeds:** `![[shot.png]]` works too. The file is loaded from `posts/img/` by name. Add `|Caption` for a caption and `|400` for a max width in px, e.g. `![[shot.png|Caption|400]]`.
+
+### Writing a post in VS Code
+
+The repo's `.vscode/` folder sets this up:
+
+1. Create `posts/YYYY-MM-DD-title.md`, type `post` and press Ctrl+Space for the front matter.
+2. Paste a screenshot (Ctrl+V) on its own line. It's saved to `posts/img/<post-name>/` and the link is inserted for you.
+3. Run the task **Blog: convert images to JPG** (Ctrl+Shift+P → Run Task). It shrinks pasted PNGs and fixes the links (`tools/jpg-images.ps1`).
+4. Check it with the task **Blog: preview site**, then open `http://localhost:8000/blog/`.
+5. Commit and push.
 
 The page needs to be able to list the folder. Any of these works:
 

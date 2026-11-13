@@ -10,7 +10,8 @@ WoW Forever. Oh my god, it's really good.
 I'm a big fan of it. Not just because it brings back that old-school MMO vibe I've been looking for, but because it seems to understand *why* that vibe was so good in the first place. It's something I don't think you see nearly enough nowadays.
 
 It really pulls on the old heartstrings of what an MMO **should** be, at least in my eyes.
-![[Pasted image 20261113143432.jpg]]
+
+![](img/2026-11-12-wow-forever-breath-of-fresh-air/screenshot.jpg)
 
 ## An MMO shouldn't just be a gear treadmill
 
