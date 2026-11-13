@@ -132,28 +132,53 @@ a.post-card:hover .post-card-title, a.post-card:focus-visible .post-card-title {
 .prose > * { margin: 0 0 1.35em; }
 .prose > :last-child { margin-bottom: 0; }
 
-/* bold: a neon highlighter stripe that rises on hover */
+/* bold: a neon bar that stamps across the word as it scrolls in (.zap, added
+   by blog.js), settles into a thick underline, and glitches in RGB on hover */
 .prose strong {
   color: #f0fff8;
-  padding: 0 .08em;
-  background: linear-gradient(rgba(125, 255, 200, .22), rgba(125, 255, 200, .22)) 0 100% / 100% .32em no-repeat;
+  padding: 0 .1em;
+  background: linear-gradient(var(--neon), var(--neon)) 0 100% / 100% .16em no-repeat;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  transition: background-size .2s ease-out;
+  text-shadow: 0 0 .6em rgba(125, 255, 200, .35);
+  transition: background-size .15s steps(3);
 }
-.prose strong:hover { background-size: 100% 100%; }
-.prose a strong, .prose h1 strong, .prose h2 strong, .prose h3 strong, .prose h4 strong { padding: 0; background: none; }
+.prose strong.zap { animation: bold-zap .7s both; }
+.prose strong:hover {
+  background-size: 100% .3em;
+  animation: bold-glitch .5s steps(1) infinite;
+}
+@keyframes bold-zap {
+  0%   { background-size: 0% 100%;    color: #f0fff8;   animation-timing-function: steps(5); }
+  40%  { background-size: 100% 100%;  color: var(--ink); text-shadow: none; }
+  65%  { background-size: 100% 100%;  color: var(--ink); text-shadow: none; animation-timing-function: steps(4); }
+  100% { background-size: 100% .16em; color: #f0fff8; }
+}
+@keyframes bold-glitch {
+  0%   { text-shadow: -.06em 0 0 var(--cyan), .06em 0 0 var(--red); }
+  25%  { text-shadow: .05em .03em 0 var(--cyan), -.05em -.02em 0 var(--purple); }
+  50%  { text-shadow: -.03em -.03em 0 var(--purple), .07em .02em 0 var(--cyan); }
+  75%  { text-shadow: .04em 0 0 var(--red), -.06em .03em 0 var(--cyan); }
+  100% { text-shadow: -.06em 0 0 var(--cyan), .06em 0 0 var(--red); }
+}
+.prose :is(a, h1, h2, h3, h4) strong, .prose :is(a, h1, h2, h3, h4) strong:hover { padding: 0; background: none; text-shadow: none; animation: none; }
 
-/* italics: a faint ghostly glow that brightens on hover */
+/* italics: the title's gloss sheen, swept across as it scrolls in and on hover */
 .prose em {
-  color: #d9c6ff;
-  text-shadow: 0 0 .55em rgba(176, 97, 255, .45);
-  transition: color .2s, text-shadow .2s;
+  --sheen: 0%;
+  color: transparent;
+  background: var(--sheen-band) var(--sheen) 0 / 400% 100% no-repeat, #d9c6ff;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  text-shadow: 0 0 .55em rgba(176, 97, 255, .4);
 }
-.prose em:hover { color: #efe6ff; text-shadow: 0 0 .4em rgba(176, 97, 255, .9), 0 0 1.1em rgba(176, 97, 255, .5); }
+.prose :is(h1, h2, h3, h4) em { color: inherit; background: none; text-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .prose strong, .prose em { transition: none; }
+  .prose strong { transition: none; }
+  .prose strong.zap, .prose strong:hover { animation: none; }
 }
 .prose del { color: var(--bone); }
 .prose mark { padding: 0 .2em; background: var(--yellow); color: var(--ink); }
@@ -465,8 +490,8 @@ a.post-card:hover .post-card-title, a.post-card:focus-visible .post-card-title {
   .progress, .read-spine, .back, .code-copy, .post-nav, .tagbar { display: none !important; }
   .prose > *, .post-head, .post-end > * { opacity: 1 !important; transform: none !important; }
   .prose, .prose strong, .prose em, .post-card-title { color: #000; }
-  .prose strong { background: none; }
-  .prose em { text-shadow: none; }
+  .prose strong { background: none; text-shadow: none; animation: none; }
+  .prose em { background: none; text-shadow: none; }
   .code, .quote, .callout, .table-wrap { background: none; box-shadow: none; }
   .code pre { color: #000; white-space: pre-wrap; }
   .shot img { box-shadow: none; }

@@ -235,6 +235,16 @@ export function initCVMotion({ gsap, ScrollTrigger, bg, reduced, ids }) {
     });
   });
 
+  /* "see more" bows out as soon as the reader starts scrolling, and returns at the very top */
+  const more = $('.more');
+  if (more) {
+    ScrollTrigger.create({
+      start: 2,
+      end: 'max',
+      onToggle: ({ isActive }) => more.classList.toggle('gone', isActive),
+    });
+  }
+
   const spine = $('.spine');
   const spineEnd = $('.spine-end');
   const setSpine = (p) => {
@@ -250,7 +260,6 @@ export function initCVMotion({ gsap, ScrollTrigger, bg, reduced, ids }) {
   /* splash recedes and the rings unwind as you scroll away from it */
   gsap.timeline({ scrollTrigger: { trigger: '#top', start: 'top top', end: 'bottom top', scrub: 0.5 } })
     .fromTo('#stage', { yPercent: 0, scale: 1, opacity: 1 }, { yPercent: 12, scale: 0.84, opacity: 0, ease: 'none', duration: 1 }, 0)
-    .fromTo('.more-in', { opacity: 1 }, { opacity: 0, ease: 'none', duration: 0.3 }, 0)
     .fromTo(bg.state, { dim: 0 }, { dim: 1, ease: 'none', duration: 1 }, 0);
 
   /* "see more" arrow nudges downward */

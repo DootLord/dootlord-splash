@@ -373,6 +373,25 @@ function enter(el, delay) {
   if (h) gsap.fromTo(h, { '--sheen': '0%' }, { '--sheen': '100%', duration: 0.9, ease: 'none', delay: delay + 0.2 });
   const cs = el.matches('.prose *') ? [] : $$('.chips li', el);
   if (cs.length) gsap.from(cs, { scale: 0, duration: 0.3, ease: 'back.out(2.5)', stagger: 0.03, delay: delay + 0.25 });
+  // inline emphasis: bold stamps in, italics catch the sheen
+  $$('strong', el).filter((s) => !s.closest('a, h1, h2, h3, h4')).forEach((s, i) => {
+    // drop the class once it has played, or un-hovering would replay it
+    s.addEventListener('animationend', (e) => { if (e.animationName === 'bold-zap') s.classList.remove('zap'); });
+    gsap.delayedCall(delay + 0.35 + i * 0.12, () => s.classList.add('zap'));
+  });
+  $$('em', el).filter((e) => !e.closest('h1, h2, h3, h4')).forEach((e, i) => sweepEm(e, delay + 0.4 + i * 0.1));
+}
+
+function sweepEm(em, delay = 0) {
+  gsap.fromTo(em, { '--sheen': '0%' }, { '--sheen': '100%', duration: 0.8, ease: 'none', delay, overwrite: true });
+}
+
+// italics re-catch the sheen whenever the pointer moves onto them
+if (!RM) {
+  view.addEventListener('mouseover', (e) => {
+    const em = e.target.closest?.('.prose em');
+    if (em && !em.contains(e.relatedTarget) && !gsap.isTweening(em)) sweepEm(em);
+  });
 }
 
 function revealAll(els) {
