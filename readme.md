@@ -35,6 +35,7 @@ scp my-post.md server:/path/to/site/posts/2026-11-10-my-post.md
 
 - **Formatting:** `posts/_demo.md` shows every block type (callouts, code, images, tables, dividers). View it at `/blog/?p=_demo`.
 - **Images:** put them in `posts/` (or a subfolder) and reference them relative to the post.
+- **Obsidian embeds:** `![[shot.png]]` works too. The file is loaded from `posts/img/` by name. Add `|Caption` for a caption and `|400` for a max width in px, e.g. `![[shot.png|Caption|400]]`.
 
 The page needs to be able to list the folder. Any of these works:
 

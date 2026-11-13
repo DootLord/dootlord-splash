@@ -87,6 +87,7 @@ async function listFiles() {
 }
 
 const plain = (md) => md
+  .replace(/!\[\[[^\]]*\]\]/g, '')
   .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
   .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
   .replace(/[*_`~]/g, '')
@@ -212,8 +213,37 @@ function postHtml(post, newer, older) {
 const CALLOUTS = { NOTE: 'note', TIP: 'tip', IMPORTANT: 'note', WARNING: 'warn', CAUTION: 'warn', DOOT: 'doot' };
 const slugify = (s) => s.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
 
+// Obsidian image embeds -> <img>, looked up in posts/img/ by file name:
+//   ![[shot.png]]            plain
+//   ![[shot.png|Caption]]    alt text, shown as the caption
+//   ![[shot.png|400]]        max width in px (or 400x300)
+//   ![[shot.png|Caption|400]]
+// Code spans and fenced blocks are left alone.
+const IMG_DIR = 'img/';
+const IMG_EXT = /\.(png|jpe?g|gif|webp|avif|svg|bmp)$/i;
+function obsidianEmbeds(md) {
+  return md.split(/(^(?:```|~~~)[\s\S]*?^(?:```|~~~)|`[^`\n]*`)/m).map((part, i) => (i % 2 ? part : part.replace(
+    /!\[\[([^\]|#]+)(?:#[^\]|]*)?((?:\|[^\]|]*)*)\]\]/g,
+    (whole, name, opts) => {
+      name = name.trim();
+      if (!IMG_EXT.test(name)) return whole;
+      let alt = '';
+      let width = '';
+      for (const o of opts.split('|').slice(1).map((s) => s.trim())) {
+        const size = o.match(/^(\d+)(?:x\d+)?$/);
+        if (size) width = size[1];
+        else if (o) alt = o;
+      }
+      const file = name.split('/').pop();
+      const src = IMG_DIR + encodeURIComponent(file);
+      return `<img src="${esc(src)}" alt="${esc(alt)}"${width ? ` style="width:${width}px"` : ''}>`;
+    },
+  // an embed alone on its line is its own block, even with no blank line around it
+  ).replace(/^[ \t]*(<img src="img\/[^\n]*>)[ \t]*$/gm, '\n$1\n'))).join('');
+}
+
 function renderProse(target, md) {
-  target.innerHTML = marked.parse(md, { gfm: true });
+  target.innerHTML = marked.parse(obsidianEmbeds(md), { gfm: true });
 
   // headings: anchors, and the big ones get the glossy treatment
   const seen = new Set();
@@ -244,7 +274,13 @@ function renderProse(target, md) {
     img.loading = 'lazy';
     img.decoding = 'async';
     // an image on its own line becomes a framed figure with a caption
-    const p = img.parentElement;
+    // (a bare <img> line is an HTML block, so it sits straight in the prose)
+    let p = img.parentElement;
+    if (p === target) {
+      p = document.createElement('p');
+      img.replaceWith(p);
+      p.append(img);
+    }
     if (p.tagName === 'P' && p.childNodes.length === 1) {
       const fig = document.createElement('figure');
       fig.className = 'shot';
