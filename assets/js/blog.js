@@ -439,9 +439,11 @@ async function showPost(slug, posts) {
 
   // reading progress: rainbow bar under the nav, and a spine in the margin
   const spine = $('.spine', readSpine);
+  const spineEnd = $('.spine-end', readSpine);
   const setProgress = (p) => {
     gsap.set(progress, { scaleX: p });
     spine.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+    spineEnd.classList.toggle('on', p >= 0.995);
   };
   setProgress(0);
   track(ScrollTrigger.create({

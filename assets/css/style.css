@@ -643,7 +643,7 @@ button { font: inherit; color: inherit; }
 
 /* career: a spine with a job hanging off each rib */
 
-.timeline { position: relative; padding: 50px 0 0 66px; }
+.timeline { position: relative; padding: 50px 0 56px 66px; }
 .timeline ol { list-style: none; display: grid; gap: clamp(20px, 3vw, 30px); margin: 0; padding: 0; }
 
 .spine-skull {
@@ -658,10 +658,27 @@ button { font: inherit; color: inherit; }
   position: absolute;
   left: 5px;
   top: 44px;
-  bottom: 0;
+  bottom: 44px;
   width: 25px;
   background: var(--img-spine) top center / 25px 25px repeat-y;
   clip-path: inset(0 0 calc(100% - var(--p, 0%)) 0);
+}
+/* the skull at the far end: a faint ghost until the spine reaches it */
+.spine-end {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 35px;
+  height: 40px;
+  background: var(--img-skull) center / contain no-repeat;
+  opacity: .18;
+  filter: grayscale(1);
+  transform: scale(.8);
+  transition: opacity .25s, filter .25s, transform .4s cubic-bezier(.34, 1.8, .64, 1);
+}
+.spine-end.on { opacity: 1; filter: none; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .spine-end { transition: none; }
 }
 
 .job { position: relative; }
@@ -758,16 +775,16 @@ a.project:hover, a.project:focus-visible {
 
 @media (max-width: 560px) {
   .bar-name { display: none; }
-  .timeline { padding: 42px 0 0 42px; }
-  .spine-skull { width: 28px; height: 32px; }
-  .spine { left: 4px; top: 36px; width: 20px; background-size: 20px 20px; }
+  .timeline { padding: 42px 0 46px 42px; }
+  .spine-skull, .spine-end { width: 28px; height: 32px; }
+  .spine { left: 4px; top: 36px; bottom: 36px; width: 20px; background-size: 20px 20px; }
   .rib { left: -18px; width: 18px; top: 24px; }
 }
 
 /* ---------- print: a plain, readable CV ---------- */
 
 @media print {
-  #bg, .splash, .bar, .sfx, .fx, .foot a, .spine, .spine-skull, .rib, .open { display: none !important; }
+  #bg, .splash, .bar, .sfx, .fx, .foot a, .spine, .spine-skull, .spine-end, .rib, .open { display: none !important; }
   body { background: #fff; color: #000; }
   .cv { max-width: none; padding: 0; color: #000; font-size: 10.5pt; }
   .sec { padding-top: 18pt; }

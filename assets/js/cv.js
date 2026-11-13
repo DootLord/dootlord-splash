@@ -90,6 +90,7 @@ const SECTIONS = [
       <div class="timeline">
         <span class="spine-skull" aria-hidden="true"></span>
         <span class="spine" aria-hidden="true"></span>
+        <span class="spine-end" aria-hidden="true"></span>
         <ol>
           ${experience.map((j) => `
           <li class="job reveal">
@@ -235,9 +236,14 @@ export function initCVMotion({ gsap, ScrollTrigger, bg, reduced, ids }) {
   });
 
   const spine = $('.spine');
+  const spineEnd = $('.spine-end');
+  const setSpine = (p) => {
+    spine.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+    spineEnd?.classList.toggle('on', p >= 0.995);
+  };
 
   if (reduced) {
-    spine?.style.setProperty('--p', '100%');
+    if (spine) setSpine(1);
     return;
   }
 
@@ -257,7 +263,7 @@ export function initCVMotion({ gsap, ScrollTrigger, bg, reduced, ids }) {
       start: 'top 75%',
       end: 'bottom 65%',
       scrub: true,
-      onUpdate: ({ progress }) => spine.style.setProperty('--p', (progress * 100).toFixed(1) + '%'),
+      onUpdate: ({ progress }) => setSpine(progress),
     });
     gsap.from('.spine-skull', {
       scale: 0, rotation: -30, duration: 0.5, ease: 'back.out(3)',
