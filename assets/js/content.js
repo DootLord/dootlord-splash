@@ -33,10 +33,20 @@ export const CONTENT = {
       { label: 'Experience', value: '8+ years' },
       { label: 'Main stack', value: 'TypeScript / Node.js' },
       { label: 'Also', value: 'Technical leadership' },
-      { label: 'Status', value: 'Currently employed' },
+      { label: 'Status', value: 'Employed' },
     ],
     education: [
-      { title: 'BSc Computer Science', place: '', period: '' },
+      {
+        title: 'BSc Computer Science',
+        place: '',
+        period: '',
+        // Optional. Shown as a list under the degree.
+        projects: [
+          { name: 'Flower classifier', summary: 'Designed and trained a neural network that identifies flowers and classifies them by species, covering data preparation, training and evaluating accuracy.' },
+          { name: 'Family home dashboard', summary: 'A self-hosted dashboard for the household, bringing together shared file hosting, local weather, news headlines and live temperature statistics from around the home.' },
+          { name: 'Self-hosted Git platform', summary: 'A GitHub-style alternative for hosting, managing and maintaining repositories, built around bug tracking so issues stay tied to the code they affect.' },
+        ],
+      },
     ],
   },
 
@@ -46,7 +56,7 @@ export const CONTENT = {
     { group: 'Data & integrations', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'WebSockets', 'SSO / JWT'] },
     { group: 'Cloud & delivery', items: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Linux', 'Grafana'] },
     { group: 'Engineering practice', items: ['Code review', 'Mentoring', 'Unit testing', 'Performance debugging', 'Production support'] },
-    { group: 'Gaming', items: ['WoW Forever enjoyer', 'Deadlock Abrams Insta-locker', 'Minecraft Create fan'] },
+    { group: 'Video Gaming', items: ['WoW Forever enjoyer', 'Deadlock Abrams Insta-locker', 'Minecraft Create fan'] },
     { group: 'Other talents', items: ['Guitarist', 'Hand farter', 'Pack opener', 'Skeleton enthusiast', 'Mono-black mana enthusiast'] },
   ],
 
@@ -134,7 +144,7 @@ export const CONTENT = {
 
   /* ---------- contact ---------- */
   contact: {
-    blurb: 'Not looking for new career opportunities, but always up for collaborating. If you have an idea or want to build something together, reach out on GitHub.',
+    blurb: 'If you have an idea or want to build something together, reach out on GitHub.',
     links: [
       { label: 'GitHub', href: 'https://github.com/DootLord' },
     ],

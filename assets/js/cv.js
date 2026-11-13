@@ -63,6 +63,10 @@ const SECTIONS = [
             <span class="row-main">${esc(e.title)}</span>
             <span class="row-sub">${esc(e.place)}</span>
             <span class="row-when">${esc(e.period)}</span>
+            ${has(e.projects) ? `
+            <ul class="points edu-projects">
+              ${e.projects.map((p) => `<li><span class="row-main">${esc(p.name)}</span> ${esc(p.summary)}</li>`).join('')}
+            </ul>` : ''}
           </li>`).join('')}
         </ul>
       </div>` : ''}`,

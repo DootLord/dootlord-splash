@@ -611,6 +611,8 @@ button { font: inherit; color: inherit; }
 .rows li:last-child { border-bottom: 0; padding-bottom: 0; }
 .row-main { color: #f0fff8; font-weight: 700; }
 .row-sub { grid-column: 1; }
+.rows li .edu-projects { grid-column: 1 / -1; margin-top: 10px; }
+.rows li .edu-projects li { display: list-item; padding: 0 0 0 20px; border: 0; }
 .row-when {
   grid-column: 2;
   grid-row: 1;
