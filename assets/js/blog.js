@@ -1,9 +1,9 @@
 // The blog: lists the Markdown files in /posts and renders them in the site's
-// style. Nothing here needs a build step or a commit per post — drop a .md
-// file into the posts folder on the server and it shows up.
+// style. tools/build-seo.mjs pre-renders each public post to blog/<slug>/ for
+// search engines and shared links; this script then takes over in the browser.
 //
-//   posts/2026-11-10-my-post.md   -> listed, newest first
-//   posts/_draft.md               -> hidden from the list, viewable at ?p=_draft
+//   posts/2026-11-10-my-post.md   -> listed, newest first, at /blog/2026-11-10-my-post/
+//   posts/_draft.md               -> hidden from the list, viewable at /blog/?p=_draft
 //
 // Optional front matter at the top of a post:
 //
@@ -410,8 +410,11 @@ function revealAll(els) {
 
 /* ---------- views ---------- */
 
-function setPageMeta(title, description, url) {
+const INDEXABLE = 'index, follow, max-image-preview:large';
+
+function setPageMeta(title, description, url, robots = INDEXABLE) {
   document.title = title;
+  document.querySelector('meta[name="robots"]')?.setAttribute('content', robots);
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
   document.querySelector('meta[name="description"]')?.setAttribute('content', description);
   for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
@@ -449,7 +452,7 @@ async function showPost(slug, posts) {
   // drafts (_name.md) aren't listed, but can still be opened by name
   if (!post) post = await fetchPost({ name: slug + '.md' }).catch(() => null);
   if (!post) {
-    setPageMeta('Not found — DOOTLORD', 'This blog post could not be found.', location.origin + BLOG);
+    setPageMeta('Not found — DOOTLORD', 'This blog post could not be found.', location.origin + BLOG, 'noindex, follow');
     view.innerHTML = `
       <section class="sec">
         <div class="panel empty">
@@ -466,7 +469,8 @@ async function showPost(slug, posts) {
   setPageMeta(
     `${post.title} — DOOTLORD`,
     post.summary || `${post.title} — a post on dootlord.meme.`,
-    location.origin + BLOG + encodeURIComponent(slug) + '/',
+    location.origin + postUrl(slug),
+    slug.startsWith('_') ? 'noindex, follow' : INDEXABLE,
   );
   view.innerHTML = postHtml(post, i > 0 ? posts[i - 1] : null, i >= 0 ? posts[i + 1] : null);
   renderProse($('#prose'), post.body);
@@ -510,6 +514,8 @@ let navigating = 0;
 async function route({ animate = true } = {}) {
   const token = ++navigating;
   const slug = new URLSearchParams(location.search).get('p') || decodeURIComponent((location.pathname.match(/\/blog\/([^/]+)\/?$/) || [])[1] || '') || null;
+  // old ?p=name links: show the clean address (drafts keep ?p=, they have no page)
+  if (slug && location.search && !slug.startsWith('_')) history.replaceState(null, '', postUrl(slug));
   const out = animate && !RM && view.firstElementChild;
   const [posts] = await Promise.all([
     loadPosts(),

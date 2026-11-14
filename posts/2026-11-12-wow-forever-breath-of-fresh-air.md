@@ -2,7 +2,7 @@
 title: WoW Forever Reminded Me What an MMO Should Feel Like
 date: 2026-11-12
 tags: gaming
-summary: I'm playing WoW Forever and I'm pleasantly suprised!
+summary: Ten levels into WoW Forever on an Undead Warlock, and it finally feels like an old-school MMO again: professions, money that matters, and no gear treadmill.
 ---
 
 WoW Forever. Oh my god, it's really good.

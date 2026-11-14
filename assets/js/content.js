@@ -56,8 +56,8 @@ export const CONTENT = {
     { group: 'Data & integrations', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'WebSockets', 'SSO / JWT'] },
     { group: 'Cloud & delivery', items: ['AWS', 'Docker', 'Kubernetes', 'CI/CD', 'Linux', 'Grafana'] },
     { group: 'Engineering practice', items: ['Code review', 'Mentoring', 'Unit testing', 'Performance debugging', 'Production support'] },
-    { group: 'Video Gaming', items: ['WoW Forever enjoyer', 'Deadlock Abrams Insta-locker', 'Minecraft Create fan'] },
-    { group: 'Other talents', items: ['Guitarist', 'Hand farter', 'Pack opener', 'Skeleton enthusiast', 'Mono-black mana enthusiast'] },
+    { group: 'Video Gaming', fun: true, items: ['WoW Forever enjoyer', 'Deadlock Abrams Insta-locker', 'Minecraft Create fan'] },
+    { group: 'Other talents', fun: true, items: ['Guitarist', 'Hand farter', 'Pack opener', 'Skeleton enthusiast', 'Mono-black mana enthusiast'] },
   ],
 
   /* ---------- career, newest first ---------- */

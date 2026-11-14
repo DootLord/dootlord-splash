@@ -24,7 +24,13 @@ const { marked } = createRequire(import.meta.url)(join(ROOT, 'assets/vendor/mark
 const { CONTENT } = await import(pathToFileURL(join(ROOT, 'assets/js/content.js')).href);
 
 const read = (p) => readFileSync(join(ROOT, p), 'utf8');
-const write = (p, s) => { mkdirSync(dirname(join(ROOT, p)), { recursive: true }); writeFileSync(join(ROOT, p), s); };
+// only touches files whose content changed, so re-running it (e.g. from the vault watcher) is quiet
+const write = (p, s) => {
+  const f = join(ROOT, p);
+  if (existsSync(f) && readFileSync(f, 'utf8') === s) return;
+  mkdirSync(dirname(f), { recursive: true });
+  writeFileSync(f, s);
+};
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const clip = (s, n) => (s.length <= n ? s : s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…');
 const jsonld = (o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
@@ -89,7 +95,7 @@ function postBodyHtml(md) {
 
 /* ---------- head builders ---------- */
 
-function head({ title, description, url, image = SOCIAL_IMAGE, type = 'website', extra = '', blog = false }) {
+function head({ title, description, url, image = SOCIAL_IMAGE, type = 'website', published = '', extra = '', blog = false }) {
   const d = clip(description, 160);
   return [
     `<title>${esc(title)}</title>`,
@@ -97,7 +103,9 @@ function head({ title, description, url, image = SOCIAL_IMAGE, type = 'website',
     `<link rel="canonical" href="${url}">`,
     '<meta name="robots" content="index, follow, max-image-preview:large">',
     `<meta property="og:site_name" content="${SITE_NAME}">`,
+    '<meta property="og:locale" content="en_GB">',
     `<meta property="og:type" content="${type}">`,
+    ...(published ? [`<meta property="article:published_time" content="${esc(published)}">`] : []),
     `<meta property="og:title" content="${esc(title)}">`,
     `<meta property="og:description" content="${esc(d)}">`,
     `<meta property="og:url" content="${url}">`,
@@ -107,8 +115,9 @@ function head({ title, description, url, image = SOCIAL_IMAGE, type = 'website',
     `<meta name="twitter:description" content="${esc(d)}">`,
     `<meta name="twitter:image" content="${image}">`,
     `<link rel="alternate" type="application/atom+xml" title="${SITE_NAME} blog" href="${SITE}/feed.xml">`,
-    // the blog is filled in by script; hide the plain fallback so it never flashes
-    ...(blog ? ['<script>document.documentElement.classList.add(\'js\')</script>', '<style>.js #view[data-prerendered]{visibility:hidden}</style>'] : []),
+    // the blog is filled in by script; hide the plain fallback so it never flashes.
+    // (Not via the .js class: style.css hides `.js .bar`, and only the homepage reveals it.)
+    ...(blog ? ['<style>#view[data-prerendered]{visibility:hidden}</style>', '<noscript><style>#view[data-prerendered]{visibility:visible}</style></noscript>'] : []),
     extra,
   ].filter(Boolean).map((l) => '  ' + l).join('\n');
 }
@@ -116,7 +125,7 @@ function head({ title, description, url, image = SOCIAL_IMAGE, type = 'website',
 /* ---------- homepage ---------- */
 
 const { about, skills, experience, projects, personal, contact } = CONTENT;
-const homeTitle = 'DootLord — Full-Stack Software Engineer | dootlord.meme';
+const homeTitle = `${about.name} — Full-Stack Software Engineer`;
 const homeDesc = `${about.name} is a ${about.role.toLowerCase()} with 8+ years of experience in TypeScript, Node.js, React and AWS. CV, projects and a blog about code and games.`;
 
 const homeHead = head({
@@ -130,7 +139,8 @@ const homeHead = head({
       {
         '@type': 'Person', '@id': `${SITE}/#person`, name: about.name, jobTitle: about.role, url: `${SITE}/`, image: IMAGE,
         sameAs: contact.links.filter((l) => /^https?:/.test(l.href)).map((l) => l.href),
-        knowsAbout: skills.flatMap((s) => s.items),
+        // groups marked `fun` in content.js stay on the page but out of the structured data
+        knowsAbout: skills.filter((s) => !s.fun).flatMap((s) => s.items),
       },
     ],
   }),
@@ -212,7 +222,7 @@ for (const p of posts) {
 <article class="post"><header class="post-head"><p class="post-meta">${p.date ? `<time datetime="${esc(p.date)}">${esc(fmtDate(p.date))}</time> · ` : ''}${p.mins} min read</p><h1 class="post-title">${esc(p.title)}</h1></header>
 <div class="prose">${bodyHtml}</div>
 <p><a href="/blog/">All posts</a></p></article>`;
-  let html = fill(absolutise(blogTemplate), 'head', head({ title: `${p.title} — ${SITE_NAME}`, description: desc, url, image, type: 'article', blog: true, extra: '  ' + jsonld(ld) }));
+  let html = fill(absolutise(blogTemplate), 'head', head({ title: `${p.title} — ${SITE_NAME}`, description: desc, url, image, type: 'article', published: p.date, blog: true, extra: '  ' + jsonld(ld) }));
   html = html.replace('<!doctype html>', '<!doctype html>\n<!-- generated:blog-post -->');
   html = markView(fill(html, 'body', article));
   write(`blog/${p.slug}/index.html`, noNoscript(html));
@@ -221,7 +231,8 @@ for (const p of posts) {
 /* ---------- sitemap + feed ---------- */
 
 const urls = [
-  { loc: `${SITE}/`, lastmod: posts[0]?.date },
+  // no lastmod for the homepage: it changes with content.js, not with posts
+  { loc: `${SITE}/` },
   { loc: `${SITE}/blog/`, lastmod: posts[0]?.date },
   ...posts.map((p) => ({ loc: postUrl(p), lastmod: p.date })),
 ];

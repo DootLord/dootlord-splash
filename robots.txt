@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /blog/?p=_
+Disallow: /tools/
 
 Sitemap: https://dootlord.meme/sitemap.xml
