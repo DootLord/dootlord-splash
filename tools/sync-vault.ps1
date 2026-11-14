@@ -13,6 +13,8 @@
 #   - PNG/BMP/TIFF images become JPGs. JPG, GIF, WebP and SVG are copied as they are.
 #   - ![[x.png|Caption]] sets the caption, ![[x.png|400]] a max width in px.
 #   - Obsidian's list-style properties (tags: on separate "- tag" lines) become "tags: a, b".
+#   - After each sync it runs tools/build-seo.mjs (if node is installed), so the post pages,
+#     sitemap and feed stay in step with posts/.
 #   - The vault is the source of truth: a dated post deleted or renamed in the vault is removed
 #     from posts/, and so are images a post no longer uses. Don't hand-edit dated posts in posts/.
 
@@ -254,8 +256,19 @@ function Sync {
   }
 }
 
+# regenerates the post pages, sitemap and feed (tools/build-seo.mjs) after each sync
+function Build-Seo {
+  if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Warn '  note   node not found: run "node tools/build-seo.mjs" yourself before committing'
+    return
+  }
+  & node (Join-Path $PSScriptRoot 'build-seo.mjs') | ForEach-Object { Log "  seo    $_" }
+  if ($LASTEXITCODE) { Log "  WARN   SEO build failed (exit $LASTEXITCODE), see above" }
+}
+
 Log "Syncing $source -> $(Rel $posts)"
 Sync
+Build-Seo
 Log 'Done.'
 if (-not $Watch) { return }
 
@@ -277,7 +290,7 @@ try {
         Remove-Event -EventIdentifier $_.EventIdentifier
       }
     } while (Wait-Event -Timeout 1)
-    if ($relevant) { Sync }
+    if ($relevant) { Sync; Build-Seo }
   }
 } finally {
   Get-EventSubscriber | Where-Object { $_.SourceIdentifier -like 'vault-*' } | Unregister-Event
