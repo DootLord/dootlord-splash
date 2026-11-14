@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>DOOTLORD blog</title>
+  <subtitle>Posts from dootlord.meme: software engineering, games and whatever else the skeleton is thinking about.</subtitle>
+  <link href="https://dootlord.meme/feed.xml" rel="self"/>
+  <link href="https://dootlord.meme/blog/"/>
+  <id>https://dootlord.meme/blog/</id>
+  <updated>2026-11-12T00:00:00Z</updated>
+  <author><name>DootLord</name></author>
+  <entry>
+    <title>WoW Forever Reminded Me What an MMO Should Feel Like</title>
+    <link href="https://dootlord.meme/blog/2026-11-12-wow-forever-breath-of-fresh-air/"/>
+    <id>https://dootlord.meme/blog/2026-11-12-wow-forever-breath-of-fresh-air/</id>
+    <updated>2026-11-12T00:00:00Z</updated>
+    <summary>I&#39;m playing WoW Forever and I&#39;m pleasantly suprised!</summary>
+  </entry>
+</feed>

@@ -20,7 +20,11 @@ import { installSprites } from './cv.js';
 const { gsap, ScrollTrigger, marked, hljs } = window;
 gsap.registerPlugin(ScrollTrigger);
 
-const POSTS = new URL('../posts/', location.href).href;
+// resolved from this script rather than the page, so it also works from the
+// pre-rendered post pages at /blog/<slug>/
+const POSTS = new URL('../../posts/', import.meta.url).href;
+const BLOG = new URL('../../blog/', import.meta.url).pathname;
+const postUrl = (slug) => `${BLOG}${encodeURIComponent(slug)}/`;
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FINE = matchMedia('(pointer: fine)').matches;
 const $ = (s, r = document) => r.querySelector(s);
@@ -165,7 +169,7 @@ function indexHtml(posts) {
       ${posts.length ? `
       <div class="post-list">
         ${posts.map((p) => `
-        <a class="panel project post-card reveal" href="?p=${encodeURIComponent(p.slug)}" data-post="${esc(p.slug)}" data-tags="${esc(p.tags.join('|'))}">
+        <a class="panel project post-card reveal" href="${postUrl(p.slug)}" data-post="${esc(p.slug)}" data-tags="${esc(p.tags.join('|'))}">
           ${metaLine(p)}
           <h2 class="post-card-title">${esc(p.title)}</h2>
           ${p.summary ? `<p>${esc(p.summary)}</p>` : ''}
@@ -182,13 +186,13 @@ function indexHtml(posts) {
 
 function postHtml(post, newer, older) {
   const nav = (p, label, cls) => (p ? `
-        <a class="panel project ${cls}" href="?p=${encodeURIComponent(p.slug)}" data-post="${esc(p.slug)}">
+        <a class="panel project ${cls}" href="${postUrl(p.slug)}" data-post="${esc(p.slug)}">
           <span class="post-nav-label">${label}</span>
           <span class="post-nav-title">${esc(p.title)}</span>
         </a>` : '<span></span>');
   return `
     <article class="post">
-      <a class="back" href="./" data-index>&lt; all posts</a>
+      <a class="back" href="${BLOG}" data-index>&lt; all posts</a>
       <header class="post-head">
         ${metaLine(post)}
         <h1 class="gloss post-title">${esc(post.title)}</h1>
@@ -232,7 +236,7 @@ function renderProse(target, md) {
       if (/^https?:/i.test(href)) { a.target = '_blank'; a.rel = 'noopener'; }
     } else if (/\.md$/i.test(href)) {
       const slug = href.split('/').pop().replace(/\.md$/i, '');
-      a.setAttribute('href', '?p=' + encodeURIComponent(slug));
+      a.setAttribute('href', postUrl(slug));
       a.dataset.post = slug;
     } else if (!href.startsWith('#') && !href.startsWith('/')) {
       a.setAttribute('href', POSTS + href);
@@ -406,8 +410,25 @@ function revealAll(els) {
 
 /* ---------- views ---------- */
 
+function setPageMeta(title, description, url) {
+  document.title = title;
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+  document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+  for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) {
+    document.querySelector(selector)?.setAttribute('content', title);
+  }
+  for (const selector of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) {
+    document.querySelector(selector)?.setAttribute('content', description);
+  }
+  document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+}
+
 function showIndex(posts) {
-  document.title = 'Blog — DOOTLORD';
+  setPageMeta(
+    'Blog — DOOTLORD',
+    'Posts from dootlord.meme: software engineering, games and whatever else the skeleton is thinking about.',
+    location.origin + BLOG,
+  );
   view.innerHTML = indexHtml(posts);
   document.body.classList.remove('reading');
   revealAll($$('.reveal', view));
@@ -428,13 +449,13 @@ async function showPost(slug, posts) {
   // drafts (_name.md) aren't listed, but can still be opened by name
   if (!post) post = await fetchPost({ name: slug + '.md' }).catch(() => null);
   if (!post) {
-    document.title = 'Not found — DOOTLORD';
+    setPageMeta('Not found — DOOTLORD', 'This blog post could not be found.', location.origin + BLOG);
     view.innerHTML = `
       <section class="sec">
         <div class="panel empty">
           <span class="empty-skull" aria-hidden="true"></span>
           <p>That post has wandered off.</p>
-          <a class="btn" href="./" data-index>all posts</a>
+          <a class="btn" href="${BLOG}" data-index>all posts</a>
         </div>
       </section>`;
     document.body.classList.remove('reading');
@@ -442,7 +463,11 @@ async function showPost(slug, posts) {
   }
 
   const i = posts.indexOf(post);
-  document.title = `${post.title} — DOOTLORD`;
+  setPageMeta(
+    `${post.title} — DOOTLORD`,
+    post.summary || `${post.title} — a post on dootlord.meme.`,
+    location.origin + BLOG + encodeURIComponent(slug) + '/',
+  );
   view.innerHTML = postHtml(post, i > 0 ? posts[i - 1] : null, i >= 0 ? posts[i + 1] : null);
   renderProse($('#prose'), post.body);
   document.body.classList.add('reading');
@@ -484,7 +509,7 @@ async function showPost(slug, posts) {
 let navigating = 0;
 async function route({ animate = true } = {}) {
   const token = ++navigating;
-  const slug = new URLSearchParams(location.search).get('p');
+  const slug = new URLSearchParams(location.search).get('p') || decodeURIComponent((location.pathname.match(/\/blog\/([^/]+)\/?$/) || [])[1] || '') || null;
   const out = animate && !RM && view.firstElementChild;
   const [posts] = await Promise.all([
     loadPosts(),
@@ -497,6 +522,7 @@ async function route({ animate = true } = {}) {
   gsap.set(view, { clearProps: 'all' });
   if (slug) await showPost(slug, posts);
   else showIndex(posts);
+  view.removeAttribute('data-prerendered');
   ScrollTrigger.refresh();
 }
 
@@ -505,8 +531,8 @@ document.addEventListener('click', (e) => {
   const a = e.target.closest('a[data-post], a[data-index]');
   if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   e.preventDefault();
-  const url = a.dataset.post ? '?p=' + encodeURIComponent(a.dataset.post) : location.pathname;
-  if (url === location.search || (url === location.pathname && !location.search)) return;
+  const url = a.dataset.post ? postUrl(a.dataset.post) : BLOG;
+  if (url === location.pathname + location.search) return;
   if (!RM) bg.burst(e.clientX, e.clientY, 26, 0.8);
   history.pushState(null, '', url);
   route();
