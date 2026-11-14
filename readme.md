@@ -117,5 +117,5 @@ static pages, manifest and Markdown stay in sync.
 - `assets/css/style.css` — shared layout and pixel styling, including a plain print stylesheet
 - `assets/css/blog.css` — blog list and post styling
 - `assets/vendor/` — GSAP 3.13 (ScrambleText, ScrollTrigger, ScrollTo), marked and highlight.js, served locally
-- `assets/img/social-preview.png` — default social sharing image; `tools/social-preview.html` is its source
+- `assets/img/social-preview.png` — default social sharing image; `tools/social-preview.html` is its source, built from the site's own CSS and background (re-render steps are in a comment at its top)
 - `audio/` — doot sounds, listed in `content.js`
